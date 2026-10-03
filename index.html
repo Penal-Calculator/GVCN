@@ -3,214 +3,329 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GVCN | Penal Code Calculator</title>
+<title>GVCN Penal Code Calculator</title>
 <link rel="icon" type="image/png" href="gvcn-logo.png">
 <style>
-:root{
-  --blue:#3b82c4; --blue2:#2b6fae; --bg:#080d15; --panel:rgba(16,25,38,.88);
-  --panel2:rgba(22,34,51,.9); --line:rgba(255,255,255,.09); --text:#f4f7fb; --muted:#9caec2;
-  --green:#55aa00; --red:#ef5350; --yellow:#e5ad2f;
-}
-*{box-sizing:border-box}
-body{
-  margin:0; min-height:100vh; color:var(--text); font-family:Inter,Segoe UI,Arial,sans-serif;
-  background:
-    radial-gradient(circle at 15% 10%, rgba(59,130,196,.20), transparent 32%),
-    radial-gradient(circle at 85% 85%, rgba(85,170,0,.12), transparent 30%),
-    linear-gradient(135deg,#070b12,#101a29 55%,#070b12);
-}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:35px 35px}
-.container{width:min(1180px,calc(100% - 28px));margin:0 auto;padding:38px 0 70px}
-.hero{text-align:center;margin-bottom:25px}
-.badge{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid rgba(59,130,196,.4);border-radius:999px;background:rgba(59,130,196,.10);color:#b9d9f5;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.badge span{width:7px;height:7px;border-radius:50%;background:#55aa00;box-shadow:0 0 12px #55aa00}
-h1{font-size:clamp(28px,5vw,46px);margin:14px 0 7px;letter-spacing:-.035em}
-.hero p{margin:0;color:var(--muted);font-size:14px}
-.warning{display:inline-block;margin-top:9px;color:#e7edf5;font-size:12px;opacity:.78}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.35);backdrop-filter:blur(14px)}
-.toolbar{padding:18px;position:sticky;top:12px;z-index:5}
-.search-wrap{display:flex;gap:10px;align-items:center}
-.search{flex:1;position:relative}
-.search input{width:100%;height:50px;border:1px solid #2b4158;border-radius:12px;background:#0b1420;color:#fff;padding:0 45px 0 45px;font-size:15px;outline:none;transition:.2s}
-.search input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,196,.14)}
-.search .icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:#8196aa;font-size:18px}
-.clear{position:absolute;right:10px;top:9px;width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:#8ea1b5;cursor:pointer}
-.clear:hover{background:#1b2939;color:#fff}
-.count{white-space:nowrap;color:#9eb0c2;font-size:13px;padding:0 5px}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.filter{border:1px solid #2a3b4e;background:#0d1724;color:#aabacc;padding:8px 11px;border-radius:9px;font-size:12px;cursor:pointer}
-.filter.active{border-color:rgba(59,130,196,.8);background:rgba(59,130,196,.17);color:#dceefe}
-.main{margin-top:15px;display:grid;grid-template-columns:1fr 360px;gap:15px;align-items:start}
-.list-panel{padding:14px}
-.section-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#8296aa;padding:8px 8px 12px}
-.results{display:grid;gap:8px}
-.code-card{display:grid;grid-template-columns:auto 74px 1fr auto;gap:12px;align-items:center;padding:12px;border:1px solid transparent;border-radius:12px;background:rgba(255,255,255,.025);transition:.18s}
-.code-card:hover{background:rgba(59,130,196,.08);border-color:rgba(59,130,196,.22);transform:translateY(-1px)}
-.code-card.selected{background:rgba(59,130,196,.13);border-color:rgba(59,130,196,.48)}
-.code-card.inactive{opacity:.55}
-.check{width:19px;height:19px;accent-color:var(--blue);cursor:pointer}
-.code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#c9e2f8;font-size:13px;font-weight:800}
-.name{font-weight:650;font-size:14px}
-.meta{color:#8093a7;font-size:11px;margin-top:4px}
-.badge-class{justify-self:start;padding:5px 8px;border-radius:7px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
-.felony{background:rgba(239,83,80,.13);color:#ff8582;border:1px solid rgba(239,83,80,.25)}
-.misdemeanor{background:rgba(229,173,47,.13);color:#f2c768;border:1px solid rgba(229,173,47,.25)}
-.citation{background:rgba(59,130,196,.13);color:#8fc8fa;border:1px solid rgba(59,130,196,.25)}
-.eviction,.unknown{background:rgba(160,120,220,.12);color:#c9aaf2;border:1px solid rgba(160,120,220,.2)}
-.punish{text-align:right;color:#b9c7d5;font-size:12px;line-height:1.35;min-width:175px}
-.punish strong{color:#f3f7fb}
-.empty{padding:45px 15px;text-align:center;color:#8498ab}
-.summary{position:sticky;top:12px;padding:18px}
-.summary h2{font-size:17px;margin:0 0 4px}
-.summary-sub{font-size:12px;color:#8396aa;margin-bottom:15px}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.stat{background:#0b1420;border:1px solid #1e2e40;border-radius:11px;padding:12px}
-.stat span{display:block;color:#71859a;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
-.stat strong{display:block;margin-top:4px;font-size:20px}
-.selected-list{margin:15px 0;display:flex;flex-wrap:wrap;gap:6px;max-height:150px;overflow:auto}
-.chip{font-family:ui-monospace,monospace;font-size:11px;padding:6px 8px;border-radius:7px;background:#17283a;color:#c9e3f8;border:1px solid #28425a}
-.actions{display:grid;gap:8px}
-button.primary{height:46px;border:0;border-radius:11px;background:linear-gradient(135deg,#3b82c4,#2b6fae);color:white;font-weight:800;cursor:pointer;box-shadow:0 8px 25px rgba(43,111,174,.25)}
-button.primary:hover{filter:brightness(1.08);transform:translateY(-1px)}
-button.primary.copied{background:#6b7280;box-shadow:none;filter:none;transform:none}
-button.secondary{height:40px;border:1px solid #293c50;border-radius:10px;background:#0d1724;color:#a9bbcc;cursor:pointer}
-button:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
-.preview{margin-top:14px;padding:14px;border-radius:11px;background:#0a0f16;border:1px solid #1d2a38}
-.preview-title{font-size:10px;color:#73879a;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
-.preview pre{white-space:pre-wrap;word-break:break-word;margin:0;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;color:#d8e2eb}
-.toast{position:fixed;right:20px;bottom:20px;background:#152335;border:1px solid #2b4259;color:#e7f0f8;padding:12px 15px;border-radius:10px;box-shadow:0 15px 35px rgba(0,0,0,.35);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;font-size:13px}
-.toast.show{opacity:1;transform:translateY(0)}
+  :root {
+    --bg: #121212;
+    --surface: #1e1e1e;
+    --surface-alt: #2a2a2a;
+    --border: #333333;
+    --text: #e0e0e0;
+    --text-muted: #888888;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --felony: #dc2626;
+    --misdemeanor: #d97706;
+    --citation: #0284c7;
+  }
 
-/* Scroll down floating button style */
-.scroll-bottom-btn {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%) translateY(10px);
-  background: linear-gradient(135deg, #3b82c4, #2b6fae);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 10px 18px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  z-index: 99;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-.scroll-bottom-btn.visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
-}
-.scroll-bottom-btn:hover {
-  filter: brightness(1.1);
-}
+  * { box-sizing: border-box; }
 
-@media(max-width:900px){.main{grid-template-columns:1fr}.summary{position:relative;top:auto}.toolbar{position:relative;top:auto}}
-@media(max-width:650px){.container{width:min(100% - 16px,1180px);padding-top:22px}.search-wrap{display:block}.count{display:block;margin-top:8px}.code-card{grid-template-columns:auto 62px 1fr}.punish{grid-column:3;text-align:left;min-width:0}.badge-class{grid-column:3}.code{font-size:11px}.name{font-size:13px}}
+  body {
+    margin: 0;
+    padding: 20px;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 15px;
+  }
+
+  h1 {
+    font-size: 20px;
+    margin: 0 0 5px 0;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin: 0;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 15px;
+  }
+
+  /* Search & Filters */
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  input[type="search"] {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    padding: 8px 12px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  input[type="search"]:focus {
+    border-color: var(--accent);
+  }
+
+  .filters {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .filter-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  /* Code List */
+  .section-header {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 15px 0 8px 0;
+    font-weight: 700;
+  }
+
+  .code-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .code-item:hover {
+    background: var(--surface-alt);
+  }
+
+  .code-item input {
+    cursor: pointer;
+  }
+
+  .code-num {
+    font-family: monospace;
+    font-weight: bold;
+    color: #93c5fd;
+    min-width: 45px;
+  }
+
+  .code-info {
+    flex: 1;
+  }
+
+  .code-name {
+    font-weight: 500;
+  }
+
+  .code-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .tag {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  .tag.felony { background: rgba(220, 38, 38, 0.2); color: #f87171; }
+  .tag.misdemeanor { background: rgba(217, 119, 6, 0.2); color: #fbbf24; }
+  .tag.citation { background: rgba(2, 132, 199, 0.2); color: #38bdf8; }
+
+  .code-punishment {
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-muted);
+    min-width: 120px;
+  }
+
+  /* Summary Sidebar */
+  .summary h2 {
+    font-size: 15px;
+    margin: 0 0 10px 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+
+  .stat-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 8px;
+    border-radius: 4px;
+  }
+
+  .stat-box label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: block;
+  }
+
+  .stat-box span {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .preview-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 10px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    margin-bottom: 12px;
+    color: #a5b4fc;
+    min-height: 80px;
+  }
+
+  button.action-btn {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 6px;
+  }
+
+  button.action-btn:hover { background: var(--accent-hover); }
+  button.action-btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+
+  button.secondary-btn {
+    width: 100%;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px;
+    cursor: pointer;
+  }
+  button.secondary-btn:hover { background: var(--surface-alt); color: var(--text); }
+
+  @media(max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
+
 <div class="container">
-  <header class="hero">
-    <div class="badge"><span></span> GVCN Public Services</div>
-    <h1>GVCN | Penal Code Calculator</h1>
-    <p>Search, select, total, and copy GVCN penal codes in a Discord-ready format.</p>
-    <div class="warning">GVCN use only. Any unauthorized use will result in a moderation action.</div>
+  <header>
+    <h1>GVCN Penal Code Calculator</h1>
+    <p class="subtitle">Internal dispatch tool for calculating cumulative charges and formatting reports.</p>
   </header>
 
-  <section class="panel toolbar">
-    <div class="search-wrap">
-      <div class="search">
-        <span class="icon">⌕</span>
-        <input id="search" type="search" placeholder="Search by code, charge, classification, or punishment..." autocomplete="off">
-        <button class="clear" id="clear" title="Clear search">×</button>
+  <div class="layout">
+    <!-- Main Database Panel -->
+    <div class="panel">
+      <div class="toolbar">
+        <input type="search" id="search" placeholder="Search code, title, or keyword..." autocomplete="off">
       </div>
-      <div class="count" id="count"></div>
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="Felony">Felony</button>
+        <button class="filter-btn" data-filter="Misdemeanor">Misdemeanor</button>
+        <button class="filter-btn" data-filter="Citation">Citation</button>
+        <button class="filter-btn" data-filter="impound">Impoundment</button>
+      </div>
+      <div id="results"></div>
+      <div id="empty" style="display:none; text-align:center; padding: 20px; color: var(--text-muted);">No matching codes found.</div>
     </div>
-    <div class="filters">
-      <button class="filter active" data-filter="all">All Codes</button>
-      <button class="filter" data-filter="Felony">Felony</button>
-      <button class="filter" data-filter="Misdemeanor">Misdemeanor</button>
-      <button class="filter" data-filter="Citation">Citation</button>
-      <button class="filter" data-filter="impound">Impoundment</button>
+
+    <!-- Summary / Sidebar Panel -->
+    <div class="panel summary">
+      <h2>Summary</h2>
+      <div class="stats-row">
+        <div class="stat-box"><label>Charges</label><span id="totalCharges">0</span></div>
+        <div class="stat-box"><label>Fine</label><span id="totalFine">$0</span></div>
+        <div class="stat-box"><label>Jail Time</label><span id="totalJail">0s</span></div>
+        <div class="stat-box"><label>Impound</label><span id="totalImpound">No</span></div>
+      </div>
+      
+      <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; font-weight: bold;">Discord Output</div>
+      <div class="preview-box" id="preview">Select a charge to generate output.</div>
+      
+      <button id="copyBtn" class="action-btn" disabled>Copy Output</button>
+      <button id="clearSelected" class="secondary-btn">Reset Selection</button>
     </div>
-  </section>
-
-  <main class="main">
-    <section class="panel list-panel">
-      <div class="section-title">Penal Code Database</div>
-      <div id="results" class="results"></div>
-      <div id="empty" class="empty" style="display:none">No penal codes matched your search.</div>
-    </section>
-
-    <aside class="panel summary">
-      <h2>Selected Charges</h2>
-      <div class="summary-sub">Choose one or more charges to calculate the combined punishment.</div>
-      <div class="stat-grid">
-        <div class="stat"><span>Charges</span><strong id="totalCharges">0</strong></div>
-        <div class="stat"><span>Total Fine</span><strong id="totalFine">$0</strong></div>
-        <div class="stat"><span>Jail Time</span><strong id="totalJail">0s</strong></div>
-        <div class="stat"><span>Impoundment</span><strong id="totalImpound">No</strong></div>
-      </div>
-      <div id="chips" class="selected-list"></div>
-      <div class="actions">
-        <button id="copyBtn" class="primary" disabled>Copy Penal Codes</button>
-        <button id="clearSelected" class="secondary">Clear Selected</button>
-      </div>
-      <div class="preview">
-        <div class="preview-title">Discord Preview</div>
-        <pre id="preview">Select a charge to generate the Discord-ready message.</pre>
-      </div>
-    </aside>
-  </main>
+  </div>
 </div>
 
-<!-- Floating Jump to Bottom / Copy Panel Button -->
-<button id="scrollToBottomBtn" class="scroll-bottom-btn">
-  <span>↓ Jump to Copy Panel</span>
-</button>
-
-<div id="toast" class="toast"></div>
-
 <script>
+// Data preserved from source[cite: 2]
 const CODES = [{"section":"1","title":"Crimes Against People","code":"(1)01","name":"Criminal Threats","classification":"Misdemeanor","jail":30,"fine":700,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)02","name":"Assault with a Deadly Weapon","classification":"Felony","jail":120,"fine":1500,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)03","name":"Battery","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)04","name":"Aggravated Battery","classification":"Felony","jail":120,"fine":1000,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)05","name":"Attempted Murder","classification":"Felony","jail":90,"fine":9000,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)06","name":"Manslaughter","classification":"Felony","jail":150,"fine":2000,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)07","name":"Murder","classification":"Felony","jail":120,"fine":2500,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)08","name":"False Imprisonment","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)09","name":"Kidnapping","classification":"Felony","jail":150,"fine":6500,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)10","name":"Homicide","classification":"Felony","jail":120,"fine":5000,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)11","name":"False Imprisonment","classification":"Felony","jail":120,"fine":1500,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)12","name":"Assault on a Public Servant","classification":"Felony","jail":120,"fine":1000,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)13","name":"Attempted Assault on a Public Servant","classification":"Felony","jail":100,"fine":1000,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)14","name":"Attempted Assault","classification":"Felony","jail":100,"fine":1000,"impound":false},{"section":"1","title":"Crimes Against People","code":"(1)15","name":"Assault on a Peace Officer","classification":"Felony","jail":100,"fine":2000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)01","name":"Arson","classification":"Felony","jail":230,"fine":5000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)02","name":"Trespassing","classification":"Misdemeanor","jail":30,"fine":1000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)03","name":"Trespassing within a Restricted Facility","classification":"Felony","jail":60,"fine":1000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)04","name":"Burglary","classification":"Felony","jail":150,"fine":250,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)05","name":"Possession of Burglary Tools","classification":"Misdemeanor","jail":30,"fine":1000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)06","name":"Robbery","classification":"Felony","jail":120,"fine":6000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)07","name":"Armed Robbery","classification":"Felony","jail":150,"fine":7500,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)08","name":"Petty Theft","classification":"Misdemeanor","jail":0,"fine":1000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)09","name":"Grand Theft","classification":"Felony","jail":90,"fine":800,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)10","name":"Grand Theft Auto","classification":"Felony","jail":160,"fine":6000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)11","name":"Receiving Stolen Property","classification":"Felony","jail":90,"fine":10000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)12","name":"Extortion","classification":"Felony","jail":150,"fine":10000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)13","name":"Forgery/Fraud","classification":"Felony","jail":90,"fine":250,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)14","name":"Vandalism","classification":"Misdemeanor","jail":30,"fine":750,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)15","name":"Loitering","classification":"Misdemeanor","jail":30,"fine":1000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)16","name":"Destruction of Civilian Property","classification":"Misdemeanor","jail":120,"fine":1000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)17","name":"Destruction of Government Property","classification":"Felony","jail":230,"fine":10000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)18","name":"Criminal Mischief","classification":"Misdemeanor","jail":30,"fine":750,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)19","name":"Possession of a Stolen Vehicle","classification":"Felony","jail":90,"fine":5000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)20","name":"Attempted Burglary","classification":"Felony","jail":120,"fine":4000,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)21","name":"Shoplifting","classification":"Misdemeanor","jail":30,"fine":500,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)22","name":"Criminal Tampering","classification":"Misdemeanor","jail":30,"fine":750,"impound":false},{"section":"2","title":"Crimes Against Property","code":"(2)23","name":"Insurance Fraud","classification":"Felony","jail":60,"fine":2000,"impound":false},{"section":"3","title":"Crimes Public Decency","code":"(3)01","name":"Lewd or Dissolute Conduct in Public","classification":"Misdemeanor","jail":90,"fine":500,"impound":false},{"section":"3","title":"Crimes Public Decency","code":"(3)02","name":"Stalking","classification":"Misdemeanor","jail":90,"fine":500,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)01","name":"Bribery","classification":"Felony","jail":120,"fine":10000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)02","name":"Dissuading a Victim","classification":"Felony","jail":60,"fine":500,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)03","name":"False Information to a Peace Officer","classification":"Misdemeanor","jail":120,"fine":500,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)04","name":"Filing a False Police Report","classification":"Misdemeanor","jail":60,"fine":500,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)05","name":"Failure to Identify to a Peace Officer","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)06","name":"Impersonation of a Public Employee","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)07","name":"Obstruction of a Peace Officer","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)08","name":"Resisting a Peace Officer","classification":"Misdemeanor","jail":120,"fine":1000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)09","name":"Escape from Custody","classification":"Felony","jail":210,"fine":1000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)10","name":"Prisoner Breakout","classification":"Felony","jail":90,"fine":10000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)11","name":"Misuse of Government Hotline","classification":"Misdemeanor","jail":0,"fine":1000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)12","name":"Tampering with Evidence","classification":"Misdemeanor","jail":0,"fine":1000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)13","name":"Introduction of Contraband","classification":"Felony","jail":120,"fine":250,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)14","name":"False Arrest","classification":"Felony","jail":120,"fine":10000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)15","name":"Failure to Inform","classification":"Misdemeanor","jail":0,"fine":500,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)16","name":"Obstruction of Justice","classification":"Felony","jail":30,"fine":500,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)17","name":"Disorderly Conduct","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)18","name":"Failure to Comply with a Lawful Order","classification":"Misdemeanor","jail":30,"fine":500,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)19","name":"Aiding and Abetting","classification":"Misdemeanor","jail":90,"fine":250,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)20","name":"Perjury","classification":"Felony","jail":90,"fine":2500,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)21","name":"Contempt of Court","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)22","name":"Escape from Custody (Attempted)","classification":"Felony","jail":120,"fine":5000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)23","name":"Unpaid Citation(s)","classification":"Misdemeanor","jail":60,"fine":400,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)24","name":"Harboring a Fugitive","classification":"Felony","jail":120,"fine":2000,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)25","name":"Fleeing an Incident","classification":"Misdemeanor","jail":60,"fine":700,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)26","name":"False Alarm","classification":"Misdemeanor","jail":60,"fine":300,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)27","name":"Possession of a Fraudulent ID","classification":"Misdemeanor","jail":30,"fine":900,"impound":false},{"section":"4","title":"Crimes Against Criminal Justice","code":"(4)28","name":"Possession of a Fraudulent Insurance","classification":"Citation","jail":0,"fine":1000,"impound":false},{"section":"5","title":"Crimes Against Public Peace","code":"(5)01","name":"Disturbing the Peace","classification":"Misdemeanor","jail":0,"fine":500,"impound":false},{"section":"5","title":"Crimes Against Public Peace","code":"(5)02","name":"Unlawful Assembly","classification":"Felony","jail":90,"fine":0,"impound":false},{"section":"5","title":"Crimes Against Public Peace","code":"(5)03","name":"Inciting Riot","classification":"Felony","jail":120,"fine":1000,"impound":false},{"section":"5","title":"Crimes Against Public Peace","code":"(5)04","name":"Distribution of Food(s) w/o Proper Documents","classification":"Misdemeanor","jail":0,"fine":900,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)01","name":"Invalid/No Vehicle Registration/Insurance","classification":"Citation","jail":0,"fine":200,"impound":true,"note":"Officer Discretion"},{"section":"6","title":"Traffic Offenses","code":"(6)02","name":"Driving Without a License","classification":"Citation","jail":0,"fine":1000,"impound":true,"note":"Officer Discretion"},{"section":"6","title":"Traffic Offenses","code":"(6)03","name":"Driving With a Suspended or Revoked License","classification":"Misdemeanor","jail":60,"fine":1000,"impound":true},{"section":"6","title":"Traffic Offenses","code":"(6)04","name":"Accident Reporting Requirements - Property Damage","classification":"Misdemeanor","jail":0,"fine":1000,"impound":true,"note":"Officer Discretion"},{"section":"6","title":"Traffic Offenses","code":"(6)05","name":"Accident Reporting Requirements - Injury or Death","classification":"Felony","jail":120,"fine":10000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)06","name":"Failure to Obey Traffic Signal","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)07","name":"Driving Opposite Lanes","classification":"Misdemeanor","jail":0,"fine":500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)08","name":"Failure to Maintain Lane","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)09","name":"Unsafe Following Distance","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)10","name":"Failure to Yield to Civilian","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)11","name":"Failure to Yield to Emergency Vehicle","classification":"Citation","jail":0,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)12","name":"Unsafe Turn","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)13","name":"Unsafe Lane Change","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)14","name":"Illegal U-Turn","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)15","name":"Speeding (5-15 MPH Over)","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)16","name":"Speeding (16-30 MPH Over)","classification":"Citation","jail":0,"fine":360,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)17","name":"Felony Speeding (31+ MPH Over)","classification":"Felony","jail":80,"fine":880,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)18","name":"Unreasonably Slow / Stopped","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)19","name":"Failure to Obey Stop Sign","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)20","name":"Illegally Parked","classification":"Citation","jail":0,"fine":250,"impound":true,"note":"Read Note"},{"section":"6","title":"Traffic Offenses","code":"(6)21","name":"Reckless Driving","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)22","name":"Street Racing","classification":"Misdemeanor","jail":0,"fine":400,"impound":true},{"section":"6","title":"Traffic Offenses","code":"(6)23","name":"Throwing Objects","classification":"Misdemeanor","jail":0,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)24","name":"Operating While Intoxicated","classification":"Misdemeanor","jail":60,"fine":2000,"impound":true},{"section":"6","title":"Traffic Offenses","code":"(6)25","name":"Enhanced Operating While Intoxicated","classification":"Felony","jail":120,"fine":4000,"impound":true},{"section":"6","title":"Traffic Offenses","code":"(6)26","name":"Alcohol Beverages in Motor Vehicles","classification":"Citation","jail":0,"fine":400,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)27","name":"Evading a Peace Officer","classification":"Misdemeanor","jail":270,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)28","name":"Felony Evading a Peace Officer","classification":"Felony","jail":350,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)29","name":"Road Rage","classification":"Misdemeanor","jail":0,"fine":1500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)30","name":"Littering","classification":"Citation","jail":0,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)31","name":"Unsafe Speed for Conditions","classification":"Citation","jail":0,"fine":2000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)32","name":"Public Endangerment","classification":"Misdemeanor","jail":0,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)33","name":"Impeding Traffic","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)34","name":"Jaywalking","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)35","name":"Unnecessary Use of Horn","classification":"Citation","jail":0,"fine":480,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)36","name":"Excessive Vehicle Sounds","classification":"Citation","jail":0,"fine":400,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)37","name":"Failure to Sign Citation","classification":"\u2014","jail":0,"fine":0,"impound":false,"inactive":true,"punishment":"NO LONGER IN USE (To be replaced)"},{"section":"6","title":"Traffic Offenses","code":"(6)38","name":"Failure to Yield to Pedestrian","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)39","name":"Distracted Driving","classification":"Citation","jail":0,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)40","name":"Driving on Shoulder/Emergency Lane","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)41","name":"Driving Without Headlights","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)42","name":"Hit and Run","classification":"Misdemeanor","jail":0,"fine":500,"impound":true},{"section":"6","title":"Traffic Offenses","code":"(6)43","name":"Attempted Vehicular Manslaughter","classification":"Felony","jail":60,"fine":750,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)46","name":"Vehicular Manslaughter","classification":"Felony","jail":120,"fine":750,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)47","name":"Reckless Evasion","classification":"Felony","jail":120,"fine":750,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)48","name":"Possession of a Stolen Vehicle","classification":"Felony","jail":120,"fine":750,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)49","name":"Reckless Endangerment","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)50","name":"Unroadworthy Vehicle","classification":"Misdemeanor","jail":0,"fine":1000,"impound":true},{"section":"6","title":"Traffic Offenses","code":"(6)51","name":"Passing a Stopped School Bus","classification":"Misdemeanor","jail":0,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)52","name":"Speeding in a School Zone (5+ MPH Over)","classification":"Misdemeanor","jail":0,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)53","name":"Drifting","classification":"Misdemeanor","jail":60,"fine":1000,"impound":true},{"section":"6","title":"Traffic Offenses","code":"(6)54","name":"Exhibition of Speed","classification":"Misdemeanor","jail":45,"fine":750,"impound":true},{"section":"6","title":"Traffic Offenses","code":"(6)55","name":"Burnout","classification":"Citation","jail":0,"fine":400,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)56","name":"Failure to Maintain Control of Vehicle","classification":"Citation","jail":0,"fine":350,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)57","name":"Unsafe Passing","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)58","name":"Passing in No Passing Zone","classification":"Citation","jail":0,"fine":300,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)59","name":"Following Emergency Vehicle Too Closely","classification":"Citation","jail":0,"fine":400,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)60","name":"Failure to Move Over for Emergency Vehicle","classification":"Citation","jail":0,"fine":500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)61","name":"Obstruction of Traffic","classification":"Citation","jail":0,"fine":350,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)62","name":"Blocking Intersection","classification":"Citation","jail":0,"fine":300,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)63","name":"Improper Turn","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)64","name":"Driving Without Due Regard","classification":"Citation","jail":0,"fine":400,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)65","name":"Operating Unsafe Vehicle","classification":"Citation","jail":0,"fine":500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)67","name":"Improper Display of License Plate","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)68","name":"Illegal Window Tint","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)69","name":"Illegal Vehicle Modifications","classification":"Citation","jail":0,"fine":500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)70","name":"Driving on a Sidewalk","classification":"Citation","jail":0,"fine":400,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)71","name":"Endangering Pedestrians","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)72","name":"Unsafe Reversing","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)73","name":"Going Around the Crossing Gates","classification":"Citation","jail":0,"fine":360,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)74","name":"Driving the Wrong Way on a One-Way Road","classification":"Citation","jail":0,"fine":400,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)75","name":"Unsafe Lane Merge","classification":"Citation","jail":0,"fine":350,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)76","name":"Failure to Dim Headlights","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)77","name":"Improper Use of High Beams","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)78","name":"Following Too Closely to an Emergency Vehicle","classification":"Citation","jail":0,"fine":500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)79","name":"Failure to Obey Traffic Control Device","classification":"Citation","jail":0,"fine":300,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)80","name":"Failure to Obey Railroad Crossing Signals","classification":"Citation","jail":0,"fine":500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)81","name":"Unsafe Backing","classification":"Citation","jail":0,"fine":300,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)82","name":"Crossing a Median","classification":"Citation","jail":0,"fine":400,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)83","name":"Failure to Secure Vehicle (Left Unattended)","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)84","name":"Improper Use of Turn Lane","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)85","name":"Unsafe Passing of a School Bus","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)86","name":"Failure to Stop at a Railroad Crossing (Commercial Vehicle)","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)87","name":"Driving Without Required Safety Equipment","classification":"Citation","jail":0,"fine":400,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)88","name":"Improper Towing of a Vehicle","classification":"Citation","jail":0,"fine":500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)89","name":"Operating a Vehicle with an Obstructed View","classification":"Citation","jail":0,"fine":350,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)90","name":"Improper Load Securement","classification":"Citation","jail":0,"fine":500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)91","name":"Failure to Abide by Curfew","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)92","name":"Vehicular Assault","classification":"Citation","jail":60,"fine":2000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)93","name":"At Fault at an Injury","classification":"Citation","jail":60,"fine":1500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)94","name":"Causing a Crash","classification":"Citation","jail":0,"fine":2000,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)95","name":"Causing Crash with Death","classification":"Citation","jail":120,"fine":1500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)96","name":"Hands Free Violation","classification":"Citation","jail":0,"fine":400,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)97","name":"Curb Hopping","classification":"Citation","jail":0,"fine":500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)98","name":"Failure to properly Attach Front Plate","classification":"Citation","jail":0,"fine":400,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)99","name":"Failure to Safely Operate Self Driven Vehicle","classification":"Citation","jail":0,"fine":500,"impound":false},{"section":"6","title":"Traffic Offenses","code":"(6)100","name":"Deceptive License Plates","classification":"Citation","jail":0,"fine":500,"impound":true},{"section":"6","title":"Traffic Offenses","code":"(6)101","name":"Improper Usage of Warning Lights","classification":"Citation","jail":0,"fine":100,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)01","name":"Possession of an Illegal Weapon","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)02","name":"Brandishing a Firearm","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)03","name":"Illegal Discharge of a Firearm","classification":"Felony","jail":90,"fine":500,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)04","name":"Unlicensed Possession of a Firearm","classification":"Felony","jail":90,"fine":500,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)05","name":"Possession of a Stolen Weapon","classification":"Felony","jail":90,"fine":500,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)06","name":"Unlawful Distribution of a Firearm","classification":"Felony","jail":90,"fine":500,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)07","name":"Possession of a Firearm by a Convicted Felon","classification":"Felony","jail":120,"fine":5000,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)08","name":"Possession of a Firearm During the Commission of a Crime","classification":"Felony","jail":120,"fine":5000,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)09","name":"Unlawful Transfer of a Firearm","classification":"Felony","jail":90,"fine":2500,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)10","name":"Tampering with a Firearm Serial Number","classification":"Felony","jail":120,"fine":5000,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)11","name":"Possession of a Firearm with an Obliterated Serial Number","classification":"Felony","jail":90,"fine":3000,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)12","name":"Possession of a Prohibited Weapon","classification":"Felony","jail":90,"fine":3000,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)13","name":"Unlawful Sale of a Firearm","classification":"Felony","jail":120,"fine":5000,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)14","name":"Negligent Storage of a Firearm","classification":"Misdemeanor","jail":30,"fine":1000,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)15","name":"Reckless Handling of a Firearm","classification":"Misdemeanor","jail":60,"fine":1500,"impound":false},{"section":"7","title":"Control Of A Deadly Weapon And Equipment","code":"(7)16","name":"Possession of a Firearm in a Restricted Area","classification":"Misdemeanor","jail":60,"fine":1000,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)01","name":"Unlawfully Injuring Wildlife","classification":"Misdemeanor","jail":0,"fine":1000,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)02","name":"Unlawful Sale of Wildlife","classification":"Misdemeanor","jail":90,"fine":2000,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)03","name":"Unlawfully Harvesting Natural Resources","classification":"Misdemeanor","jail":30,"fine":600,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)04","name":"Unlawful Captivity of Wildlife","classification":"Misdemeanor","jail":30,"fine":900,"impound":false,"note":"Officer Discretion"},{"section":"8","title":"Crimes Against Nature","code":"(8)05","name":"Disruption of Wildlife","classification":"Citation","jail":0,"fine":500,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)06","name":"Camping on a Non-designated Campground","classification":"Citation","jail":0,"fine":150,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)07","name":"In Park After Hours","classification":"Citation","jail":0,"fine":150,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)08","name":"Trespassing on Rail Road Property","classification":"Misdemeanor","jail":30,"fine":800,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)09","name":"Illegally Harvesting Game","classification":"Misdemeanor","jail":60,"fine":2000,"impound":false,"note":"Officer Discretion"},{"section":"8","title":"Crimes Against Nature","code":"(8)10","name":"Possession of Illegally Harvested Game","classification":"Misdemeanor","jail":30,"fine":800,"impound":false,"note":"Officer Discretion"},{"section":"8","title":"Crimes Against Nature","code":"(8)11","name":"Destroying Wildlife By Means Of Arson","classification":"Felony","jail":180,"fine":15000,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)12","name":"Illegal Off-Roading","classification":"Citation","jail":0,"fine":250,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)13","name":"Trespassing on a National Park","classification":"Misdemeanor","jail":0,"fine":150,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)14","name":"Camping Without a Permit","classification":"Eviction","jail":0,"fine":0,"impound":false,"punishment":"None"},{"section":"8","title":"Crimes Against Nature","code":"(8)15","name":"Discharge of Firearm Within a National Park","classification":"Felony","jail":100,"fine":8000,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)16","name":"Littering Within a National Park","classification":"Citation","jail":0,"fine":150,"impound":false},{"section":"8","title":"Crimes Against Nature","code":"(8)17","name":"Entering a Restricted Area of a National Park","classification":"Misdemeanor","jail":90,"fine":800,"impound":false}];
+
 const state = { selected: new Set(), query: "", filter: "all" };
 
-const results = document.getElementById("results");
-const empty = document.getElementById("empty");
-const search = document.getElementById("search");
-const count = document.getElementById("count");
-const preview = document.getElementById("preview");
-const toast = document.getElementById("toast");
-const scrollToBottomBtn = document.getElementById("scrollToBottomBtn");
+const resultsEl = document.getElementById("results");
+const emptyEl = document.getElementById("empty");
+const searchEl = document.getElementById("search");
+const previewEl = document.getElementById("preview");
 
 const money = n => "$" + Number(n).toLocaleString("en-US");
 
 function punishmentText(c){
   if(c.inactive) return c.punishment;
   const parts = [];
-  if(c.jail) parts.push(`Jail Time: ${c.jail}s`);
-  if(c.fine) parts.push(`${money(c.fine)} Fine`);
-  if(c.impound) parts.push(`Impoundment${c.note ? " ("+c.note+")" : ""}`);
-  if(!parts.length) return c.punishment || "No punishment listed";
-  return parts.join(" + ");
-}
-
-function className(c){
-  return (c.classification || "").toLowerCase().replace(/[^a-z]/g,"") || "unknown";
+  if(c.jail) parts.push(`${c.jail}s`);
+  if(c.fine) parts.push(`${money(c.fine)}`);
+  if(c.impound) parts.push(`Impound`);
+  return parts.length ? parts.join(" / ") : (c.punishment || "None");
 }
 
 function matches(c){
   const q = state.query.trim().toLowerCase();
-  const text = [c.code,c.name,c.classification,c.title,punishmentText(c)].join(" ").toLowerCase();
+  const text = [c.code, c.name, c.classification, c.title].join(" ").toLowerCase();
   const queryOK = !q || text.includes(q);
   let filterOK = true;
   if(state.filter === "impound") filterOK = !!c.impound;
@@ -220,51 +335,44 @@ function matches(c){
 
 function render(){
   const visible = CODES.filter(matches);
-  results.innerHTML = "";
+  resultsEl.innerHTML = "";
   let lastSection = null;
 
   visible.forEach(c => {
     if(lastSection !== c.section){
       const heading = document.createElement("div");
-      heading.className = "section-title";
-      heading.style.paddingTop = lastSection === null ? "8px" : "18px";
+      heading.className = "section-header";
       heading.textContent = `Title ${c.section}: ${c.title}`;
-      results.appendChild(heading);
+      resultsEl.appendChild(heading);
       lastSection = c.section;
     }
 
-    const card = document.createElement("label");
-    card.className = "code-card" + (state.selected.has(c.code) ? " selected" : "") + (c.inactive ? " inactive" : "");
+    const row = document.createElement("label");
+    row.className = "code-item";
     const checked = state.selected.has(c.code) ? "checked" : "";
-    card.innerHTML = `
-      <input class="check" type="checkbox" data-code="${c.code}" ${checked} ${c.inactive ? "disabled" : ""}>
-      <div class="code">${c.code}</div>
-      <div>
-        <div class="name">${escapeHTML(c.name)}</div>
-        <div class="meta">${escapeHTML(c.title)}${c.note ? " • " + escapeHTML(c.note) : ""}</div>
+    const tagClass = (c.classification || "").toLowerCase();
+    
+    row.innerHTML = `
+      <input type="checkbox" data-code="${c.code}" ${checked} ${c.inactive ? "disabled" : ""}>
+      <span class="code-num">${c.code}</span>
+      <div class="code-info">
+        <div class="code-name">${escapeHTML(c.name)}</div>
+        <div class="code-meta"><span class="tag ${tagClass}">${escapeHTML(c.classification)}</span></div>
       </div>
-      <div>
-        <div class="badge-class ${className(c)}">${escapeHTML(c.classification)}</div>
-        <div class="punish">${escapeHTML(punishmentText(c))}</div>
-      </div>`;
-    results.appendChild(card);
+      <div class="code-punishment">${escapeHTML(punishmentText(c))}</div>
+    `;
+    resultsEl.appendChild(row);
   });
 
-  count.textContent = `${visible.length} code${visible.length === 1 ? "" : "s"} shown`;
-  empty.style.display = visible.length ? "none" : "block";
+  emptyEl.style.display = visible.length ? "none" : "block";
 
-  document.querySelectorAll(".check").forEach(box => {
-    box.addEventListener("change", () => {
-      if(box.checked) state.selected.add(box.dataset.code);
-      else state.selected.delete(box.dataset.code);
+  document.querySelectorAll("input[type='checkbox']").forEach(box => {
+    box.addEventListener("change", (e) => {
+      if(e.target.checked) state.selected.add(e.target.dataset.code);
+      else state.selected.delete(e.target.dataset.code);
       updateSummary();
-      render();
-      checkScrollPosition();
     });
   });
-  
-  // Re-check scroll button visibility after rendering elements
-  checkScrollPosition();
 }
 
 function updateSummary(){
@@ -278,62 +386,25 @@ function updateSummary(){
   document.getElementById("totalJail").textContent = `${jail}s`;
   document.getElementById("totalImpound").textContent = impound ? "Yes" : "No";
 
-  const chips = document.getElementById("chips");
-  chips.innerHTML = selected.map(c => `<span class="chip">${escapeHTML(c.code)}</span>`).join("");
-
   const copyBtn = document.getElementById("copyBtn");
   copyBtn.disabled = !selected.length;
 
-  preview.textContent = selected.length ? discordMessage(selected,fine,jail,impound) : "Select a charge to generate the Discord-ready message.";
-}
-
-function discordMessage(selected,fine,jail,impound){
-  const lines = [
-    `**Charge(s):** ${selected.map(c => `${c.code} -${c.name}`).join(", ")}`,
-    `*Total Fine:* ${money(fine)}`,
-    `*Jail Time:* ${jail}s`,
-    `*Impoundment:* ${impound ? "Yes" : "No"}`
-  ];
-  return lines.join("\n");
+  if(selected.length) {
+    previewEl.textContent = `**Charge(s):** ${selected.map(c => `${c.code} -${c.name}`).join(", ")}\n*Total Fine:* ${money(fine)}\n*Jail Time:* ${jail}s\n*Impoundment:* ${impound ? "Yes" : "No"}`;
+  } else {
+    previewEl.textContent = "Select a charge to generate output.";
+  }
 }
 
 function escapeHTML(str){
   return String(str).replace(/[&<>"']/g, ch => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[ch]));
 }
 
-// Logic to show scroll button only when not at the bottom
-function checkScrollPosition() {
-  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-  const scrollHeight = document.documentElement.scrollHeight;
-  const clientHeight = document.documentElement.clientHeight;
-  
-  // Distance from bottom (threshold of 40px to account for rounding/margins)
-  const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
-  
-  // Only show if there's actual content to scroll down to AND we aren't near the bottom
-  if (scrollHeight > clientHeight + 100 && distanceFromBottom > 60) {
-    scrollToBottomBtn.classList.add("visible");
-  } else {
-    scrollToBottomBtn.classList.remove("visible");
-  }
-}
+searchEl.addEventListener("input", e => { state.query = e.target.value; render(); });
 
-window.addEventListener("scroll", checkScrollPosition);
-window.addEventListener("resize", checkScrollPosition);
-
-scrollToBottomBtn.addEventListener("click", () => {
-  window.scrollTo({
-    top: document.documentElement.scrollHeight,
-    behavior: "smooth"
-  });
-});
-
-search.addEventListener("input", e => { state.query = e.target.value; render(); });
-document.getElementById("clear").addEventListener("click", () => { search.value=""; state.query=""; render(); search.focus(); });
-
-document.querySelectorAll(".filter").forEach(btn => {
+document.querySelectorAll(".filter-btn").forEach(btn => {
   btn.addEventListener("click", () => {
-    document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     state.filter = btn.dataset.filter;
     render();
@@ -347,44 +418,18 @@ document.getElementById("clearSelected").addEventListener("click", () => {
 });
 
 document.getElementById("copyBtn").addEventListener("click", async () => {
-  const selected = CODES.filter(c => state.selected.has(c.code));
-  if(!selected.length) return;
-  const fine = selected.reduce((s,c) => s + (c.fine || 0), 0);
-  const jail = selected.reduce((s,c) => s + (c.jail || 0), 0);
-  const impound = selected.some(c => c.impound);
-  const msg = discordMessage(selected,fine,jail,impound);
   try {
-    await navigator.clipboard.writeText(msg);
-    markCopied();
-    showToast("Penal codes copied in Discord format.");
-  } catch {
-    const ta=document.createElement("textarea");
-    ta.value=msg; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove();
-    markCopied();
-    showToast("Penal codes copied.");
+    await navigator.clipboard.writeText(previewEl.textContent);
+    const btn = document.getElementById("copyBtn");
+    btn.textContent = "Copied!";
+    setTimeout(() => btn.textContent = "Copy Output", 1500);
+  } catch(e) {
+    console.error(e);
   }
 });
 
-function markCopied(){
-  const btn = document.getElementById("copyBtn");
-  btn.classList.add("copied");
-  btn.textContent = "Copied!";
-  clearTimeout(btn._copyTimer);
-  btn._copyTimer = setTimeout(() => {
-    btn.classList.remove("copied");
-    btn.textContent = "Copy Penal Codes";
-  }, 1500);
-}
-
-function showToast(message){
-  toast.textContent=message;
-  toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"),2200);
-}
-
 render();
 updateSummary();
-setTimeout(checkScrollPosition, 100); // Initial check
 </script>
 </body>
 </html>
