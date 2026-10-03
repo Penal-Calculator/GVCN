@@ -252,8 +252,8 @@
   }
   button.secondary-btn:hover { background: var(--surface-alt); color: var(--text); }
 
-  /* Scroll to Top Button (Only visible on mobile / when stacked at bottom) */
-  .scroll-top-btn {
+  /* Scroll Down to Summary Button (Only visible on mobile / stacked layout) */
+  .scroll-down-btn {
     display: none;
     position: fixed;
     bottom: 20px;
@@ -272,13 +272,13 @@
     justify-content: center;
   }
 
-  .scroll-top-btn:hover {
+  .scroll-down-btn:hover {
     background: var(--accent-hover);
   }
 
   @media(max-width: 800px) {
     .layout { grid-template-columns: 1fr; }
-    .scroll-top-btn.visible {
+    .scroll-down-btn.visible {
       display: flex;
     }
   }
@@ -310,7 +310,7 @@
     </div>
 
     <!-- Summary / Sidebar Panel -->
-    <div class="panel summary">
+    <div class="panel summary" id="summaryPanel">
       <h2>Summary</h2>
       <div class="stats-row">
         <div class="stat-box"><label>Charges</label><span id="totalCharges">0</span></div>
@@ -328,8 +328,8 @@
   </div>
 </div>
 
-<!-- Scroll to Top Button -->
-<button id="scrollTopBtn" class="scroll-top-btn" title="Scroll to top">&#8593;</button>
+<!-- Scroll Down to Summary Button -->
+<button id="scrollDownBtn" class="scroll-down-btn" title="Scroll to summary">&#8595;</button>
 
 <script>
 // Data preserved from source[cite: 5]
@@ -341,7 +341,8 @@ const resultsEl = document.getElementById("results");
 const emptyEl = document.getElementById("empty");
 const searchEl = document.getElementById("search");
 const previewEl = document.getElementById("preview");
-const scrollTopBtn = document.getElementById("scrollTopBtn");
+const scrollDownBtn = document.getElementById("scrollDownBtn");
+const summaryPanel = document.getElementById("summaryPanel");
 
 const money = n => "$" + Number(n).toLocaleString("en-US");
 
@@ -445,7 +446,7 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
 document.getElementById("clearSelected").addEventListener("click", () => {
   state.selected.clear();
   updateSummary();
-    render();
+  render();
 });
 
 document.getElementById("copyBtn").addEventListener("click", async () => {
@@ -459,33 +460,31 @@ document.getElementById("copyBtn").addEventListener("click", async () => {
   }
 });
 
-// Scroll to top button logic
-window.addEventListener("scroll", () => {
+// Scroll down button logic (shows only on mobile/small window when layout stacks at bottom)
+function checkScrollButton() {
   if (window.innerWidth <= 800) {
-    if (window.scrollY > 300) {
-      scrollTopBtn.classList.add("visible");
+    const summaryRect = summaryPanel.getBoundingClientRect();
+    // Show button if the summary panel is below the current viewport view
+    if (summaryRect.top > window.innerHeight) {
+      scrollDownBtn.classList.add("visible");
     } else {
-      scrollTopBtn.classList.remove("visible");
+      scrollDownBtn.classList.remove("visible");
     }
   } else {
-    scrollTopBtn.classList.remove("visible");
+    scrollDownBtn.classList.remove("visible");
   }
-});
+}
 
-window.addEventListener("resize", () => {
-  if (window.innerWidth > 800 || window.scrollY <= 300) {
-    scrollTopBtn.classList.remove("visible");
-  } else if (window.innerWidth <= 800 && window.scrollY > 300) {
-    scrollTopBtn.classList.add("visible");
-  }
-});
+window.addEventListener("scroll", checkScrollButton);
+window.addEventListener("resize", checkScrollButton);
 
-scrollTopBtn.addEventListener("click", () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
+scrollDownBtn.addEventListener("click", () => {
+  summaryPanel.scrollIntoView({ behavior: "smooth" });
 });
 
 render();
 updateSummary();
+checkScrollButton();
 </script>
 </body>
 </html>
